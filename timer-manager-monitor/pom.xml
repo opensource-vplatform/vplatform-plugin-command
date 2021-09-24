@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.yindangu.plugin</groupId>
+	<artifactId>timer-manager-monitor</artifactId>
+	<name>${project.groupId}-${project.artifactId}</name>
+	<packaging>jar</packaging>
+	<description>定时任务监控</description>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+	    <maven.compiler.source>1.8</maven.compiler.source>
+	    <maven.compiler.target>1.8</maven.compiler.target>
+	    <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+	    <logback.version>1.2.6</logback.version>
+	</properties>
+
+	<dependencies>
+		<!-- ////////////////插件依赖开始/////////////////// -->
+		<dependency>
+  			<groupId>com.yindangu.v3.platform</groupId>
+  	  		<artifactId>plugin-business-api</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.yindangu.v3.platform</groupId>
+			<artifactId>plugin-register</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.yindangu.v3.platform</groupId>
+			<artifactId>plugin-utils</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+		
+		<!-- ////////////////插件依赖结束//////////////////// -->
+		
+ 
+		
+		<!-- 解析序列化Json格式数据的第三方jar包 ===================================BEGIN -->
+		<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.5</version>
+		</dependency>
+		<!-- 解析序列化Json格式数据的第三方jar包 ===================================END -->
+
+		<!-- ***************** logback 日志****************** -->
+		<!-- https://www.cnblogs.com/ryelqy/p/10314147.html -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
+		<!-- ***************** logback 日志****************** -->
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+	      <groupId>javax.servlet</groupId>
+	      <artifactId>servlet-api</artifactId>
+	      <version>2.5</version>
+	      <scope>provided</scope>
+	    </dependency>
+ 
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin><!-- 把依赖的包导出来，方便发布构件时选择 -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

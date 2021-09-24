@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>定时任务监控</title>
+ </head>
+ <style rel="stylesheet" type="text/css">
+ .body1{ 
+	font-size: 14px;
+ }
+ .headerx{
+	margin:4px;
+	
+ }
+ .headerx a{
+	padding: 4px;
+	margin:4px;
+ }
+ a{
+	text-decoration: none;
+ }
+
+ .tablex{
+	border-collapse: collapse;
+ }
+ .th1,.tdx{
+	border: 1px solid #bbb; 
+	padding: 4px;
+	word-wrap:break-word;
+	word-break:break-all; 
+ }
+ tr:nth-child(even) {
+	background-color: #eee;
+}
+.inputx{
+	margin:4px;
+}
+
+ .pnl-left{
+	float:left;
+ }
+ .pnl-right{
+     float:right;
+ }
+.systeminfo{
+	width:100%; 
+	border:1px solid #808080;
+	margin-bottom: 10px;
+}
+.errmsg{
+	color:#f00;
+}
+.hide {
+   display: none;
+}
+ </style>
+ <body class="body1">
+
+<div style="width:100%;clear:both"> 
+	<table id="rocksWorks" width="100%" class="tablex">
+		<caption>空间名</caption>
+		<tr>
+			<th class='th1' style="align:left" colspan="10">
+				<input type="text" id="findspace" style="width:70%" class='inputx'>
+				<button type="button" onclick="doSarchWorspace()" class='inputx'>查找</button>
+				<button type="button" onclick="doSarchaction()" class='inputx'>正在运行中的任务</button>  
+			</th>
+		</tr>
+		<tr class="workheader">
+			<th class='th1' style="width:30px">no</th>
+			<th class='th1' style="width:60%">taskName</th>
+			<th class='th1 dyc' style="width:30px">hour</th>
+			<th class='th1 dyc' style="width:30px">count</th>
+			<th class='th1 dyc' style="width:50px">state</th>
+			<th class='th1 dyc' style="width:50px">scene</th> 
+		</tr>
+	</table>
+</div>
+<script type="text/javascript" src="../itop/common/jquery/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+
+//<![CDATA[
+window.onload=function(){
+	doLoadData("allTask","");
+}
+/**查找*/
+function doSarchWorspace(){
+	var searchKey = $("#findspace").val();
+	var opt = (searchKey ? "findTask" :"allTask");
+	doLoadData(opt,searchKey);
+}
+/**运行中的任务*/
+function doSarchaction(){
+	doLoadData("action","");
+}
+function doLoadData(opt ,searchKey){ 
+	post({"execute":opt,"search":searchKey || "" },function(result){
+		var rds = result.data || [];
+		var tbs = $("#rocksWorks");
+		tbs.find("tr.dyc").remove();
+		if(!result.success){
+			alert(result.msg);
+			return ;
+		}	
+		var lengthx = rds.length;
+		var fields=[];
+		if(lengthx>0){
+			var workheader =tbs.find("tr.workheader");
+			workheader.find("th.dyc").remove();//动态列头
+			var head = rds[0];
+			for(var p in head){
+				if(p!="taskName"){
+					fields.push(p);
+					workheader.append("<th class='th1 dyc'>" + p+ "</th>");
+				}
+			}
+		}
+		else{
+			tbs.append("<tr class='tdh dyc'><td class='tdx' colspan='10' style='text-align: center;color:red'>没有定时任务</td></tr>");
+		}
+ 
+		for(var i =0 ;i < lengthx;i++){
+			var bo = rds[i];
+			var spname=bo.taskName;
+			var html=("<tr class='tdh dyc'>"
+				+ "<td class='tdx'>" + (i+1) +"</td>" 
+				+ "<td class='tdx'>" + spname + "</td>" ); 
+			for(var x = 0; x < fields.length;x++){
+				var fd=fields[x];
+				if(fd=="state"){ //修改状态					
+					html= html + ("<td class='tdx'><a href='#' onclick='doTaskState(\"" + spname + "\")'>" + (bo[fd] || "") + "</a></td>" );
+				}
+				else{
+					html= html + ("<td class='tdx'>" + (bo[fd] || "")+ "</td>" );
+				}
+			}
+			html= html + "</tr>";
+			tbs.append(html);
+		}
+	}); 
+}
+/**设置状态*/
+function doTaskState(taskName){
+	post({"execute":"setState","taskName":taskName || "" },function(result){
+		if(result.success){
+			alert(taskName + "任务状态改为:" + result.data);
+		}
+		else{
+			alert(taskName + "任务状态修改不成功:" + result.message);
+		}
+	});
+}
+function post(pars,callFn){
+	//operation=rocksMonitor&type=workspace&prefix=&fields=serializedsize
+	pars =pars ||　{};
+	pars["operation"]="timertask";
+	pars["groupId"]="com.yindangu.plugin.command";
+	pars["bundleCode"]="timerManager";
+	//operation=mycmd&groupId=com.yindangu.plugin&bundleCode=mydemo
+	$.post("/module-operation!executeOperation",pars　,function(result){
+		if(callFn){
+			var rds = result.data || {"success":false,"message": result.msg || "没有返回业务结果！"};
+			callFn(rds);
+		}
+		else{
+			alert("请求完成！");
+		}
+	});
+}
+
+//]]>
+</script>
+ </body>
+</html>
