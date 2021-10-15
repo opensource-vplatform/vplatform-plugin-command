@@ -195,4 +195,8 @@ class MyTask  {
 		ITimeVo vo = proxy.getStartTime();
 		return (vo == null ? "": vo.getDate());
 	}
+	public String getStackTrace() {
+		StackTraceElement st = proxy.getStackTrace();
+		return(st == null ? "": st.toString());
+	}
 }
